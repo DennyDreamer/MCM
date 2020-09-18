@@ -21,7 +21,7 @@ class SignalProcessor(nn.Module) :
     def forward(self, input):
         out, (h_n, c_n) = self.lstm(input)
         out = self.fc(out[:,-1,:])
-        out = F.log_softmax(out, dim=1)
+        out = F.softmax(out, dim=1)
         print(out)
         return out
 
@@ -33,13 +33,13 @@ class SignalProcessor(nn.Module) :
 if __name__ == "__main__":
 
     n_epoch = 10
-    lr = 0.01
+    lr = 0.001
 
     model = SignalProcessor(20, 64, 2)
     model = model.cuda()
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    loss_func = nn.NLLLoss()
+    loss_func = nn.CrossEntropyLoss()
 
     # print(model)
     # train_loader = DataLoader(dataset=train_set, batch_size=12, shuffle=False, num_workers=2)
@@ -59,6 +59,7 @@ if __name__ == "__main__":
             x = Variable(x.float().cuda())
             y = Variable(y.long().squeeze().cuda())
             output = model(x)
+            optimizer.zero_grad()
             loss = loss_func(output, y)
             loss.backward()
             optimizer.step()
