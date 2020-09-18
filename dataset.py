@@ -7,14 +7,14 @@ class Mydataset(Dataset):
 
 
     def __init__(self):
-        self.path="excel_to_python.csv"
+        self.path="data1.txt"
         data = np.array(pd.read_csv(self.path,sep='\t'));
-        self.char= data[:,1:2].reshape(-1,50,1)
-        self.index = data[:,0:1].reshape(-1,50,1)
+        self.char= data[:,1:2].reshape(-1,64,1)
+        self.index = data[:,0:1].reshape(-1,64,1)
         train_data=  data[:,2:22]
         test_data = data[:,22:23]
-        train_data = train_data.reshape(-1,50,20)
-        test_data = test_data.reshape(-1,50,1)
+        train_data = train_data.reshape(-1,1,64,20)
+        test_data = test_data.reshape(-1,64,1)
         self.train_data = torch.from_numpy(train_data);
         self.test_data =  torch.from_numpy(test_data)
         self.len = data.shape[0]
