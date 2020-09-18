@@ -1,25 +1,3 @@
-.vscode/settings.json
-S1/S1_test_data.xlsx
-S1/S1_test_event.xlsx
-S1/S1_train_data.xlsx
-S1/S1_train_event.xlsx
-S2/S2_test_data.xlsx
-S2/S2_test_event.xlsx
-S2/S2_train_data.xlsx
-S2/S2_train_event.xlsx
-S3/S3_test_data.xlsx
-S3/S3_test_event.xlsx
-S3/S3_train_data.xlsx
-S3/S3_train_event.xlsx
-S4/S4_test_data.xlsx
-S4/S4_test_event.xlsx
-S4/S4_train_data.xlsx
-S4/S4_train_event.xlsx
-S5/S5_test_data.xlsx
-S5/S5_test_event.xlsx
-S5/S5_train_data.xlsx
-S5/S5_train_event.xlsx
-__pycache__/dataset.cpython-37.pyc
 
 huan_test.py
 .vscode/settings.json
@@ -33,3 +11,9 @@ data.txt
 data.ipynb
 .vscode/settings.json
 .vscode/settings.json
+data1(1).txt
+data2(1).txt
+data3(1).txt
+data4(1).txt
+data5(1).txt
+data1.txt
