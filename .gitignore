@@ -20,3 +20,6 @@ S5/S5_test_event.xlsx
 S5/S5_train_data.xlsx
 S5/S5_train_event.xlsx
 __pycache__/dataset.cpython-37.pyc
+
+huan_test.py
+.vscode/settings.json
