@@ -6,12 +6,12 @@ import torch.optim as optim
 
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
-from dataset import Mydataset
+from dataset import Mydataset, LSTMdataset
 
 N_CHANNEL = 20
 N_FEATURE = 64
 N_CLASS = 2
-BATCH_SIZE = 20
+BATCH_SIZE = 16
 
 class MyLoss(nn.Module):
 
@@ -27,24 +27,23 @@ class SignalProcessor(nn.Module) :
         super().__init__()
         self.lstm = nn.LSTM(input_size = n_channel, 
                             hidden_size = n_feature, 
-                            num_layers = 2)
+                            num_layers = 1)
         self.fc = nn.Linear(in_features = n_feature, 
                             out_features = n_class)
         self.fc.weight.data.normal_(0, 0.1)
-        self.e = nn.Embedding(50, n_feature)
-        self.sigmoid = nn.Sigmoid()
+        self.active = nn.ReLU()
         self.drop = nn.Dropout(p=0.1)
-        self.softmax = nn.LogSoftmax(dim = 1)
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, input):
-        h_0 = torch.randn(2, 50, N_FEATURE).cuda()
-        c_0 = torch.randn(2, 50, N_FEATURE).cuda()
+        # h_0 = torch.randn(2, 32, N_FEATURE).cuda()
+        # c_0 = torch.randn(2, 32, N_FEATURE).cuda()
         # out = self.e(input)
-        out = nn.LayerNorm(input.size()[1:])
+        # out = nn.BatchNorm1d(50)
         
-        out, (h_n, c_n) = self.lstm(input, (h_0, c_0))
+        out, (h_n, c_n) = self.lstm(input)
         out = self.fc(out[:,-1,:])
-        out = self.softmax(out)
+        # out = self.softmax(out)
         # print(out)
         return out
 
@@ -57,18 +56,19 @@ class SignalProcessor(nn.Module) :
 if __name__ == "__main__":
 
     n_epoch = 100
-    lr = 0.01
+    lr = 0.0001
 
     model = SignalProcessor(N_CHANNEL, N_FEATURE, N_CLASS)
     model = model.cuda()
     
-    optimizer = optim.SGD(model.parameters(), lr=lr, weight_decay=1e-3, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-3)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 5, gamma = 0.2, last_epoch=-1)
     loss_func = nn.CrossEntropyLoss()
 
     # print(model)
     # train_loader = DataLoader(dataset=train_set, batch_size=12, shuffle=False, num_workers=2)
     
-    dataSet = Mydataset()
+    dataSet = LSTMdataset()
     total = len(dataSet)
     train_size = int(0.8*total)
     valid_size = total - train_size
@@ -78,11 +78,13 @@ if __name__ == "__main__":
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
 
     for epoch in range(n_epoch):
+        model.zero_grad()
+        # scheduler.step()
         for batch, (x, y, c, index) in enumerate(train_loader):
             x = Variable(x.float().cuda())
             y = Variable(y.long().squeeze().cuda())
             output = model(x)
-        
+
             loss = loss_func(output, y)
             optimizer.zero_grad()
             loss.backward()
@@ -96,8 +98,9 @@ if __name__ == "__main__":
                 output = model.predict(x)
                 # print(output, y)
                 for i, o in enumerate(output):
-                    if(o == y[i]): correct+=1
+                    if(y[i] != 0) and (y[i] != 1): print('error')
+                    if (o == y[i]): correct+=1
 
             print('Epoch: %d | loss: %f | accuracy: %f'%(epoch+1, loss, correct/valid_size))
 
-    torch.save(model, 'model1.pkl')
+    torch.save(model, 'model\lstm_model1.pkl')
