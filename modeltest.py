@@ -9,35 +9,49 @@ from torch.utils.data import Dataset, DataLoader
 from dataset import Mydataset, LSTMdataset
 from SignalCNN import SignalCNN
 
-model_dir = 'model/signal_cnn.pkl'
+model_dir = 'model/scnn_0_512_32fr_3.pkl'
 data_dir = 'data/testdata3.txt'
-
+0
 if __name__ == "__main__":
     
     model = torch.load(model_dir)
     dataset = Mydataset(data_dir)
     test_loader = DataLoader(dataset=dataset, batch_size=60, shuffle=False)
 
-    correct = 0
+    # correct = 0
     total = len(test_loader)
     for batch, (x, y, c, index) in enumerate(test_loader):
         x = x.float().cuda()
+        y = y.long().cuda()
         index = index[:, 1, :]
         output = model.forward(x)
         if(batch % 1 == 0):
             print("character %d"%(batch+1))
+
+        # pred = torch.argmax(output, dim=1)
+        # for i, o in enumerate(pred):
+        #     if(o == y[i]): correct+=1
         output = output[:, 1]
-        maxIndex = torch.argmax(output, dim=0)     #第二列最大值下标
-        rol = index[maxIndex]                      #最大下标所在行或列
-        maxp = 0.
-        lor = 0.
+        
+        # print(y)
+        p = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        
 
         for i, o in enumerate(output):
-            if o > maxp and ((index[i]-6.5)*(rol-6.5) < 0):
-                maxp = o
-                lor = index[i]
+            p[index[i].int().item() - 1] += o.item()
 
-        
-        print(rol.int().item(), lor.int().item())
+        # print(p)
+        i1 = p.index(max(p))
+        offset = 0
+        if(i1 + 1 > 6):
+            lp = p[0:6]
+        else :
+            lp = p[6:12]
+            offset = 6
+        i2 = lp.index(max(lp))
+            
+        print(i1+1, i2+1+offset)
+    # print("accur: %f"%(correct/total))
+
 
 

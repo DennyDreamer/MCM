@@ -51,7 +51,6 @@ class Mydataset(Dataset):
         self.test_data =  torch.from_numpy(test_data)
         self.len = data.shape[0]
 
-
         # super().__init__()
 
     def __getitem__(self, index):
