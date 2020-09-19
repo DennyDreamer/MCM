@@ -65,6 +65,7 @@ class SignalCNN(nn.Module) :
         pred = torch.argmax(pred, dim=1)
         return pred
 
+data_dir = 'data/testdata1.txt'
 
 if __name__ == "__main__":
     
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 50, gamma = 0.1, last_epoch=-1)
     loss_func = nn.CrossEntropyLoss()
 
-    dataSet = Mydataset()
+    dataSet = Mydataset(data_dir)
     total = len(dataSet)
     train_size = int(0.8*total)
     valid_size = total - train_size
@@ -108,4 +109,4 @@ if __name__ == "__main__":
 
             print('Epoch: %d | loss: %f | accuracy: %f'%(epoch+1, loss, correct/valid_size))
 
-        torch.save(scnn, 'model1.pkl')
+        torch.save(scnn, 'model\model1.pkl')
