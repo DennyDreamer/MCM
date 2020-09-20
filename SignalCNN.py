@@ -68,7 +68,8 @@ class SignalCNN(nn.Module) :
         pred = torch.argmax(pred, dim=1)
         return pred
 
-data_dir = 'data/data5.txt'
+data_dir = 'data/data1.txt'
+model_dir = 'model\scnn_0_512_32fr_1.pkl'
 
 if __name__ == "__main__":
     
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     train_size = int(0.8*total)
     valid_size = total - train_size
     train_dataset, valid_dataset = torch.utils.data.random_split(dataSet, [train_size, valid_size])
-    train_loader = DataLoader(dataset=dataSet, batch_size=BATCH_SIZE, shuffle=True)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE, shuffle=True)
     # test_loader = DataLoader(dataset=testSet, batch_size=60, shuffle=True)
 
@@ -150,4 +151,4 @@ if __name__ == "__main__":
 
             print('Epoch: %d | loss: %f | accuracy: %f'%(epoch+1, loss, correct/valid_size))
 
-    torch.save(scnn, 'model\scnn_0_512_32fr_5.pkl')
+    torch.save(scnn, model_dir)

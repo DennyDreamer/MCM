@@ -9,9 +9,9 @@ from torch.utils.data import Dataset, DataLoader
 from dataset import Mydataset, LSTMdataset
 
 N_CHANNEL = 20
-N_FEATURE = 64
+N_FEATURE = 32
 N_CLASS = 2
-BATCH_SIZE = 16
+BATCH_SIZE = 100
 
 class MyLoss(nn.Module):
 
@@ -31,21 +31,23 @@ class SignalProcessor(nn.Module) :
         self.fc = nn.Linear(in_features = n_feature, 
                             out_features = n_class)
         self.fc.weight.data.normal_(0, 0.1)
+        self.normal = nn.LayerNorm((32, 32))
         self.active = nn.ReLU()
         self.drop = nn.Dropout(p=0.1)
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, input):
+    def forward(self, x):
         # h_0 = torch.randn(2, 32, N_FEATURE).cuda()
         # c_0 = torch.randn(2, 32, N_FEATURE).cuda()
         # out = self.e(input)
         # out = nn.BatchNorm1d(50)
         
-        out, (h_n, c_n) = self.lstm(input)
-        out = self.fc(out[:,-1,:])
-        # out = self.softmax(out)
+        x, (h_n, c_n) = self.lstm(x)
+        x = self.normal(x)
+        x = self.fc(x[:,-1,:])
+        x = self.softmax(x)
         # print(out)
-        return out
+        return x
 
     def predict(self, x):
         pred = self.forward(x)
@@ -56,7 +58,7 @@ class SignalProcessor(nn.Module) :
 if __name__ == "__main__":
 
     n_epoch = 100
-    lr = 0.0001
+    lr = 0.01
 
     model = SignalProcessor(N_CHANNEL, N_FEATURE, N_CLASS)
     model = model.cuda()
@@ -90,7 +92,7 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
-        if((epoch+1) % 10 == 0) :
+        if((epoch+1) % 1 == 0) :
             correct = 0
             for batch, (x, y, c, index) in enumerate(valid_loader):
                 x = Variable(x.float().cuda())

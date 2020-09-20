@@ -10,7 +10,7 @@ class LSTMdataset(Dataset):
     
 
     def __init__(self):
-        self.path="data\data1_32_norm.txt"
+        self.path="data\data1.txt"
         data = np.array(pd.read_csv(self.path,sep='\t'));
         self.char= data[:,1:2].reshape(-1,32,1)
         self.index = data[:,0:1].reshape(-1,32,1)
